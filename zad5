@@ -1,0 +1,145 @@
+//AMELIA LIPIŃSKA 203721
+//ALICJA SZAJGIN 203383
+
+#include <iostream>
+
+using namespace std;
+
+struct node {
+	int data;
+	node* left;
+	node* right;
+};
+
+
+
+node* createNode(int leafData)
+{
+	node* temp = new node();
+	temp->data = leafData; 
+	temp->right = temp->left = NULL; 
+	return temp; 
+}
+
+
+
+void addNode(node*& root, int leafData)
+{
+	if (root == NULL)
+	{
+		root = createNode(leafData);
+	}
+	else if (root->data < leafData)
+	{
+		addNode(root->right, leafData);  
+	}
+	else if (root->data > leafData)
+	{
+		addNode(root->left, leafData);   
+	}
+}
+
+
+void DrawTree(node* root, int space = 0, int amount = 5) {
+	if (root == NULL) return;  
+
+	space += amount;
+
+	DrawTree(root->right, space);
+
+	cout << endl;
+	for (int i = amount; i < space; i++) {
+		cout << " ";  
+	}
+	cout << root->data << endl; 
+
+	DrawTree(root->left, space);
+}
+
+node* FindMinimal(node* root) {
+	while (root->left != NULL) {
+		root = root->left;
+	}
+	return root;
+}
+
+node* Delete(node* root, int number)
+{
+
+	if (root == NULL)
+	{
+		return root;
+	}else
+		if (number < root->data)
+		{
+			root->left = Delete(root->left, number);
+		}else
+			if (number > root->data)
+			{
+				root->right = Delete(root->right, number);
+			}
+			else if (number == root->data)
+			{
+				if (root->left == NULL && root->right == NULL)
+				{
+					delete root;
+					root = NULL;
+				}
+
+				else if (root->left == NULL)
+				{
+					node* temp = root->right;
+					delete root;
+					return temp;
+				}
+				else if (root->right == NULL)
+				{
+					node* temp = root->left;
+					delete root;
+					return temp;
+				}
+				else if(root->right!=NULL && root->left!=NULL)
+				{
+					node* temp = FindMinimal(root->right);
+					root->data = temp->data; 
+					root->right = Delete(root->right, temp->data);
+				}
+
+			}
+		return root;
+ }
+
+int main()
+{
+	int number;
+	node* root = NULL;
+
+	do
+	{
+		cout << "WYBIERZ:\n1.DODAJ WEZEL\n2.USUN WEZEL\n3.WYSWIETL DRZEWO\n4.WYJSCIE";
+		int choice;
+		cout << endl;
+		cin >> choice;
+		switch (choice)
+		{
+		case 1:
+			cout << "Podaj liczbe ktora chcesz wstawic do drzewa: "<<endl;
+			cin >> number;
+			addNode(root, number);
+			break;
+		case 2:
+			cout << "Podaj liczbe ktora chcesz usunac z drzewa: "<<endl;
+			cin >> number;
+			root = Delete(root, number);
+			break;
+		case 3:
+			DrawTree(root);
+			break;
+		case 4:
+			exit(0);
+			break;
+		default:
+			cout << "Nie ma takiej opcji";
+		}
+	} while (true);
+}
